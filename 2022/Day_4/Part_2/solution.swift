@@ -27,9 +27,9 @@ class Puzzle {
                 .split(separator: ",")
                 .map { 
                     let range = $0.split(separator: "-").compactMap { Int($0) }
-                    return Set(range[0]...range[1])
+                    return range[0]...range[1]
                 }
-            if !parts[0].intersection(parts[1]).isEmpty || !parts[1].intersection(parts[0]).isEmpty {
+            if parts[0].overlaps(parts[1]) {
                 result += 1
             }
         }
