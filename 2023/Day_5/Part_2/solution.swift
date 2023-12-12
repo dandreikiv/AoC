@@ -46,30 +46,32 @@ class Solver {
             i = i + 1
         } 
 
-        var idx = 0
-
-        var minLoc = Int.max
-        while idx < seeds.count {
-            let start = seeds[idx]
-            let length = seeds[idx + 1]
-
-            for seed in start...start+length {
-                let loc = locationForSeed(seed, maps: maps)
-                minLoc = min(minLoc, loc)
+        var location = 0
+        while true {
+            let seed = seedForLocation(location, maps: maps)
+            if isSeed(seed, inRanges: seeds) {
+                return location
             }
-
-            idx += 2
+            location += 1
         }
-
-        // print(starts.sorted())
-
-        return minLoc
-
-
-        return locationForSeed(99, maps: maps)
     }
 
-    func locationForSeed(_ seed: Int, maps: [String: [[Int]]]) -> Int {
+    func isSeed(_ seed: Int, inRanges ranges: [Int]) -> Bool {
+        var idx = 0
+        while idx < ranges.count {
+            let start = ranges[idx]
+            let length = ranges[idx + 1]
+            
+            if seed >= start && seed <= start + length {
+                return true
+            }
+            idx += 2
+        }
+        return false
+    }
+
+   
+    func seedForLocation(_ loc: Int, maps: [String: [[Int]]]) -> Int {
         let seedToSoil = maps["seed-to-soil map:", default: []]
         let soilToFertilizer = maps["soil-to-fertilizer map:", default: []]
         let fertilizerToWater = maps["fertilizer-to-water map:", default: []]
@@ -78,22 +80,15 @@ class Solver {
         let temperatureToHumidity = maps["temperature-to-humidity map:", default: []]
         let humidityToLocation = maps["humidity-to-location map:", default: []]
 
-        let soil = convert(seed, using: seedToSoil)
-        print("seed: \(seed) to soil: \(soil)")
-        let fertilizer = convert(soil, using: soilToFertilizer)
-        print("soil: \(soil) to fertilizer: \(fertilizer)")
-        let water = convert(fertilizer, using: fertilizerToWater)
-        print("fertilizer: \(fertilizer) to water: \(water)")
-        let light = convert(water, using: waterToLight)
-        print("water: \(water) to light: \(water)")
-        let temperature = convert(light, using: lightToTemperature)
-        print("light: \(light) to temperature: \(temperature)")
-        let humidity = convert(temperature, using: temperatureToHumidity)
-        print("temperature: \(temperature) to humidity: \(humidity)")
-        let location = convert(humidity, using: humidityToLocation)
-        print("humidity: \(humidity) to location: \(location)", location)
+        let humidity = convert(loc, using: humidityToLocation)
+        let temperature = convert(humidity, using: temperatureToHumidity)
+        let light = convert(temperature, using: lightToTemperature)
+        let water = convert(light, using: waterToLight)
+        let fertilizer = convert(water, using: fertilizerToWater)
+        let soil = convert(fertilizer, using: soilToFertilizer)
+        let seed = convert(soil, using: seedToSoil)
 
-        return location
+        return seed
     }
 
     func convert(_ input: Int, using ranges: [[Int]]) -> Int {
@@ -102,8 +97,8 @@ class Solver {
             let source = range[1]
             let length = range[2]
 
-            if input >= source && input < source + length {
-                return dest + input - source
+            if input >= dest && input < dest + length {
+                return input - dest + source
             }
         }
         return input
