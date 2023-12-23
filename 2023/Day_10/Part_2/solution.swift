@@ -80,31 +80,23 @@ class Solver {
             }
         }
 
-        // print("edges: ", edges)
         var xVals: [Int] = []
         for i in 0..<edges.count {
             xVals.append(edges[i][1])
         }
-        // xVals.append(edges[0][1])
 
         var yVals: [Int] = []
         for i in 0..<edges.count {
             yVals.append(edges[i][0])
         }
-        // yVals.append(edges[0][0])
         
         var determ = 0
         for i in 0..<xVals.count - 1 {
             determ += xVals[i] * yVals[i + 1] - yVals[i] * xVals[i + 1]
         }
 
-        // print("determ", determ)
-
-
         let det = determ / 2
-        // print("determ / 2: ", determ / 2)
-        // print("visited.count: ",  visited.count)
-        // print("visited.count / 2: ",  visited.count / 2)
+        
         let innerDots = det - visited.count / 2 + 1
         print("innerDots = ", innerDots)
 
